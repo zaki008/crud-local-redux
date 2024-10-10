@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import 'react-native-get-random-values';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -12,8 +12,20 @@ import {
   ItemUser,
   ModalAddEditUser,
 } from '../../components';
-import {deleteUser, editUser, postAddUser} from '../../redux/action';
-import {AllertShow, Colors, FontFamily, FontSize, useForm} from '../../utils';
+import {
+  deleteUser,
+  editUser,
+  getDataUser,
+  postAddUser,
+} from '../../redux/action';
+import {
+  AllertShow,
+  Colors,
+  FontFamily,
+  FontSize,
+  getData,
+  useForm,
+} from '../../utils';
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
@@ -24,6 +36,17 @@ const HomeScreen = () => {
     email: '',
   });
   const [idEdit, setIdEdit] = useState(null);
+
+  const getLocalListUser = async () => {
+    const data = await getData('listUser');
+    if (data) {
+      dispatch(getDataUser(data));
+    }
+  };
+
+  useEffect(() => {
+    getLocalListUser();
+  }, []);
 
   const handleCloseModal = () => {
     resetForm();
@@ -45,30 +68,36 @@ const HomeScreen = () => {
   };
 
   const handleSubmit = () => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (form.name.trim() === '') {
-      AllertShow('Name Is Required', 'danger');
-      return;
+    try {
+      console.log('form', form);
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (form.name.trim() === '') {
+        AllertShow('Name Is Required', 'danger');
+        return;
+      }
+      if (form.email.trim() === '') {
+        AllertShow('Email Is Required', 'danger');
+        return;
+      }
+      if (!emailPattern.test(form.email.trim())) {
+        AllertShow('Invalid Email Format', 'danger');
+        return;
+      }
+      if (idEdit) {
+        dispatch(editUser(listUser, idEdit, setIdEdit, form, setVisibleModal));
+        return;
+      }
+      const formData = {
+        id: uuidv4(),
+        name: form.name,
+        email: form.email,
+        createdAt: moment(),
+      };
+      const data = [formData, ...listUser];
+      dispatch(postAddUser(data, setVisibleModal, resetForm));
+    } catch (err) {
+      console.log('err submit', err);
     }
-    if (form.email.trim() === '') {
-      AllertShow('Email Is Required', 'danger');
-      return;
-    }
-    if (!emailPattern.test(form.email.trim())) {
-      AllertShow('Invalid Email Format', 'danger');
-      return;
-    }
-    if (idEdit) {
-      dispatch(editUser(listUser, idEdit, setIdEdit, form, setVisibleModal));
-      return;
-    }
-    const data = {
-      id: uuidv4(),
-      name: form.name,
-      email: form.email,
-      createdAt: moment(),
-    };
-    dispatch(postAddUser(data, setVisibleModal, resetForm));
   };
 
   return (

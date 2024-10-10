@@ -1,9 +1,19 @@
 import moment from 'moment';
-import {ADD_USER, GET_LIST_USER} from '../types';
+import {storeData} from '../../utils';
+import {GET_LIST_USER} from '../types';
 
-export const postAddUser = (form, setIsVisible, resetForm) => dispatch => {
+export const getDataUser = data => dispatch => {
   try {
-    dispatch({type: ADD_USER, value: form});
+    dispatch({type: GET_LIST_USER, value: data});
+  } catch (err) {
+    console.log('err get', err);
+  }
+};
+
+export const postAddUser = (data, setIsVisible, resetForm) => dispatch => {
+  try {
+    dispatch(getDataUser(data));
+    storeData('listUser', data);
     resetForm();
     setIsVisible(false);
   } catch (err) {
@@ -15,7 +25,8 @@ export const deleteUser = (id, listUser) => dispatch => {
   try {
     if (listUser?.length !== '0') {
       const newData = listUser?.filter(item => item.id !== id);
-      dispatch({type: GET_LIST_USER, value: newData});
+      dispatch(getDataUser(newData));
+      storeData('listUser', newData);
     }
   } catch (err) {
     console.log('err delete', err);
@@ -36,7 +47,8 @@ export const editUser =
         }
         return item;
       });
-      dispatch({type: GET_LIST_USER, value: updatedData});
+      dispatch(getDataUser(updatedData));
+      storeData('listUser', updatedData);
       setIdEdit(null);
       setVisibleModal(false);
     } catch (err) {
