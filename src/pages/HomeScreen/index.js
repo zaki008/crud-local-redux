@@ -69,7 +69,6 @@ const HomeScreen = () => {
 
   const handleSubmit = () => {
     try {
-      console.log('form', form);
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (form.name.trim() === '') {
         AllertShow('Name Is Required', 'danger');
