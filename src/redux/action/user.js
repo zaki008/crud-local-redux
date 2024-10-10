@@ -34,7 +34,8 @@ export const deleteUser = (id, listUser) => dispatch => {
 };
 
 export const editUser =
-  (listUser, idEdit, setIdEdit, form, setVisibleModal) => dispatch => {
+  (listUser, idEdit, setIdEdit, form, setVisibleModal, resetForm) =>
+  dispatch => {
     try {
       const updatedData = listUser.map(item => {
         if (item.id === idEdit) {
@@ -49,6 +50,7 @@ export const editUser =
       });
       dispatch(getDataUser(updatedData));
       storeData('listUser', updatedData);
+      resetForm();
       setIdEdit(null);
       setVisibleModal(false);
     } catch (err) {

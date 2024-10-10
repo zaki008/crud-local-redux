@@ -84,7 +84,16 @@ const HomeScreen = () => {
         return;
       }
       if (idEdit) {
-        dispatch(editUser(listUser, idEdit, setIdEdit, form, setVisibleModal));
+        dispatch(
+          editUser(
+            listUser,
+            idEdit,
+            setIdEdit,
+            form,
+            setVisibleModal,
+            resetForm,
+          ),
+        );
         return;
       }
       const formData = {
